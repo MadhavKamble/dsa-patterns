@@ -84,46 +84,29 @@ Queue empty → return `false` ✅
 ## Clean C++ Interview Code
 
 ```cpp
-/*
- * DETECT CYCLE IN UNDIRECTED GRAPH — BFS (GFG)
- *
- * PROBLEM UNDERSTANDING:
- *   Check if any back edge exists (visited neighbor that is not the parent).
- *
- * KEY INSIGHT:
- *   Store {node, parent} in queue. If a visited neighbor ≠ parent → cycle.
- *   Outer loop handles disconnected components.
- *
- * COMPLEXITY: Time O(V+E) | Space O(V)
- */
 class Solution {
-    bool bfsCheck(int src, vector<vector<int>>& adj, vector<bool>& visited) {
-        queue<pair<int,int>> q;    // {node, parent}
-        visited[src] = true;
-        q.push({src, -1});
-
-        while (!q.empty()) {
-            auto [curr, par] = q.front(); q.pop();
-
-            for (int nb : adj[curr]) {
-                if (!visited[nb]) {
-                    visited[nb] = true;
-                    q.push({nb, curr});
-                } else if (nb != par) {
-                    return true;           // visited & not parent → cycle
-                }
-            }
-        }
-        return false;
-    }
-
 public:
     bool isCycle(int V, vector<vector<int>>& adj) {
-        vector<bool> visited(V, false);
-
-        for (int i = 0; i < V; i++) {
-            if (!visited[i]) {
-                if (bfsCheck(i, adj, visited)) return true;
+        vector<bool> visited(V,false);
+        for(int i=0;i<V;i++){
+            if(!visited[i]){
+                queue<pair<int,int>> q;
+                visited[i]=true;
+                q.push({i,-1});
+                while(!q.empty()){
+                    auto it=q.front();
+                    q.pop();
+                    int curr=it.first;
+                    int par=it.second;
+                    for(int nb : adj[curr]){
+                        if(!visited[nb]){
+                            visited[nb]=true;
+                            q.push({nb,curr});
+                        } else if(nb!=par){
+                            return true;
+                        }
+                    }
+                }
             }
         }
         return false;

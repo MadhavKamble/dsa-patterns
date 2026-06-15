@@ -85,42 +85,26 @@ isConnected = [[1,0,0],
 ## Clean C++ Interview Code
 
 ```cpp
-/*
- * NUMBER OF PROVINCES (LC 547)
- *
- * PROBLEM UNDERSTANDING:
- *   Count connected components in a graph given as adjacency matrix.
- *
- * KEY INSIGHT:
- *   Outer loop over all cities — each unvisited city starts a new province.
- *   DFS marks the entire component visited.
- *
- * COMPLEXITY: Time O(n^2) | Space O(n)
- */
 class Solution {
-    void dfs(int node, vector<vector<int>>& isConnected,
-             vector<bool>& visited) {
-        visited[node] = true;
-        for (int j = 0; j < isConnected.size(); j++) {
-            if (isConnected[node][j] == 1 && !visited[j]) {
-                dfs(j, isConnected, visited);
+    void dfs(int node, vector<vector<int>>& isConnected, vector<bool>& visited) {
+        visited[node]=true;
+        for(int j=0;j<isConnected.size();j++){
+            if(isConnected[node][j]==1 && !visited[j]){
+                dfs(j,isConnected,visited);
             }
         }
     }
-
 public:
     int findCircleNum(vector<vector<int>>& isConnected) {
-        int n = isConnected.size();
-        vector<bool> visited(n, false);
-        int provinces = 0;
-
-        for (int i = 0; i < n; i++) {
-            if (!visited[i]) {
-                provinces++;               // new component found
-                dfs(i, isConnected, visited);
+        int n=isConnected.size();
+        vector<bool> visited(n,false);
+        int provinces=0;
+        for(int i=0;i<n;i++){
+            if(!visited[i]){
+                provinces++;
+                dfs(i,isConnected,visited);
             }
         }
-
         return provinces;
     }
 };
@@ -129,31 +113,32 @@ public:
 ### BFS Variant
 
 ```cpp
-int findCircleNum(vector<vector<int>>& isConnected) {
-    int n = isConnected.size();
-    vector<bool> visited(n, false);
-    int provinces = 0;
-
-    for (int i = 0; i < n; i++) {
-        if (!visited[i]) {
-            provinces++;
-            queue<int> q;
-            visited[i] = true;
-            q.push(i);
-            while (!q.empty()) {
-                int node = q.front(); q.pop();
-                for (int j = 0; j < n; j++) {
-                    if (isConnected[node][j] == 1 && !visited[j]) {
-                        visited[j] = true;
-                        q.push(j);
+class Solution {
+public:
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n=isConnected.size();
+        vector<bool> visited(n,false);
+        int provinces=0;
+        for(int i=0;i<n;i++){
+            if(!visited[i]){
+                provinces++;
+                queue<int> q;
+                visited[i]=true;
+                q.push(i);
+                while(!q.empty()){
+                    int node=q.front(); q.pop();
+                    for(int j=0;j<n;j++){
+                        if(isConnected[node][j]==1 && !visited[j]){
+                            visited[j]=true;
+                            q.push(j);
+                        }
                     }
                 }
             }
         }
+        return provinces;
     }
-
-    return provinces;
-}
+};
 ```
 
 ### Union-Find Variant

@@ -103,44 +103,22 @@ DFS order: 0, 1, 3, 2, 4
 ## Clean C++ Interview Code
 
 ```cpp
-/*
- * DEPTH FIRST SEARCH (DFS)
- *
- * PROBLEM UNDERSTANDING:
- *   Traverse all vertices of a graph by going as deep as possible
- *   along each path before backtracking.
- *
- * DATA STRUCTURE: Recursion stack (or explicit stack)
- *
- * KEY STEPS:
- *   1. Mark current as visited, add to result
- *   2. Recurse on all unvisited neighbors
- *
- * PROPERTIES OF DFS:
- *   - Visits entire path before backtracking
- *   - Useful for: cycle detection, topological sort, connected components
- *   - Does NOT guarantee shortest path
- *
- * COMPLEXITY: Time O(V+E) | Space O(V)
- */
 class Solution {
     void dfs(int node, vector<vector<int>>& adj,
              vector<bool>& visited, vector<int>& result) {
-        visited[node] = true;
+        visited[node]=true;
         result.push_back(node);
-
-        for (int neighbor : adj[node]) {
-            if (!visited[neighbor]) {
-                dfs(neighbor, adj, visited, result);
+        for(int neighbor : adj[node]){
+            if(!visited[neighbor]){
+                dfs(neighbor,adj,visited,result);
             }
         }
     }
-
 public:
     vector<int> dfsTraversal(int n, vector<vector<int>>& adj) {
-        vector<bool> visited(n, false);
+        vector<bool> visited(n,false);
         vector<int> result;
-        dfs(0, adj, visited, result);    // start from vertex 0
+        dfs(0,adj,visited,result);
         return result;
     }
 };
@@ -149,30 +127,24 @@ public:
 ### Iterative DFS (explicit stack)
 
 ```cpp
-// Iterative DFS — avoids stack overflow on very deep graphs
 vector<int> dfsIterative(int n, vector<vector<int>>& adj) {
-    vector<bool> visited(n, false);
+    vector<bool> visited(n,false);
     vector<int> result;
     stack<int> st;
-
-    visited[0] = true;
+    visited[0]=true;
     st.push(0);
-
-    while (!st.empty()) {
-        int curr = st.top();
+    while(!st.empty()){
+        int curr=st.top();
         st.pop();
         result.push_back(curr);
-
-        // push neighbors in reverse order to match recursive DFS order
-        for (int i = adj[curr].size() - 1; i >= 0; i--) {
-            int nb = adj[curr][i];
-            if (!visited[nb]) {
-                visited[nb] = true;
+        for(int i=adj[curr].size()-1;i>=0;i--){
+            int nb=adj[curr][i];
+            if(!visited[nb]){
+                visited[nb]=true;
                 st.push(nb);
             }
         }
     }
-
     return result;
 }
 ```
@@ -180,17 +152,14 @@ vector<int> dfsIterative(int n, vector<vector<int>>& adj) {
 ### DFS for Disconnected Graphs
 
 ```cpp
-// Handle all components
 vector<int> dfsAll(int n, vector<vector<int>>& adj) {
-    vector<bool> visited(n, false);
+    vector<bool> visited(n,false);
     vector<int> result;
-
-    for (int i = 0; i < n; i++) {
-        if (!visited[i]) {
-            dfs(i, adj, visited, result);    // new component
+    for(int i=0;i<n;i++){
+        if(!visited[i]){
+            dfs(i,adj,visited,result);
         }
     }
-
     return result;
 }
 ```

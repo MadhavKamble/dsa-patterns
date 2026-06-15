@@ -92,40 +92,25 @@ Return `false` ✅
 ## Clean C++ Interview Code
 
 ```cpp
-/*
- * DETECT CYCLE IN UNDIRECTED GRAPH — DFS (GFG)
- *
- * PROBLEM UNDERSTANDING:
- *   Check if any back edge exists using DFS + parent tracking.
- *
- * KEY INSIGHT:
- *   Pass parent through recursion. If a visited neighbor ≠ parent → cycle.
- *   Outer loop handles disconnected components.
- *
- * COMPLEXITY: Time O(V+E) | Space O(V)
- */
 class Solution {
     bool dfsCheck(int node, int parent,
                   vector<vector<int>>& adj, vector<bool>& visited) {
-        visited[node] = true;
-
-        for (int nb : adj[node]) {
-            if (!visited[nb]) {
-                if (dfsCheck(nb, node, adj, visited)) return true;
-            } else if (nb != parent) {
-                return true;               // visited & not parent → cycle
+        visited[node]=true;
+        for(int nb : adj[node]){
+            if(!visited[nb]){
+                if(dfsCheck(nb,node,adj,visited)) return true;
+            } else if(nb!=parent){
+                return true;
             }
         }
         return false;
     }
-
 public:
     bool isCycle(int V, vector<vector<int>>& adj) {
-        vector<bool> visited(V, false);
-
-        for (int i = 0; i < V; i++) {
-            if (!visited[i]) {
-                if (dfsCheck(i, -1, adj, visited)) return true;
+        vector<bool> visited(V,false);
+        for(int i=0;i<V;i++){
+            if(!visited[i]){
+                if(dfsCheck(i,-1,adj,visited)) return true;
             }
         }
         return false;
@@ -141,13 +126,14 @@ public:
 // BFS approach — queue stores {node, parent}
 bool bfsCheck(int src, vector<vector<int>>& adj, vector<bool>& visited) {
     queue<pair<int,int>> q;
-    visited[src] = true;
-    q.push({src, -1});
-    while (!q.empty()) {
-        auto [curr, par] = q.front(); q.pop();
-        for (int nb : adj[curr]) {
-            if (!visited[nb]) { visited[nb] = true; q.push({nb, curr}); }
-            else if (nb != par) return true;
+    visited[src]=true;
+    q.push({src,-1});
+    while(!q.empty()){
+        auto it=q.front(); q.pop();
+        int curr=it.first; int par=it.second;
+        for(int nb : adj[curr]){
+            if(!visited[nb]){ visited[nb]=true; q.push({nb,curr}); }
+            else if(nb!=par) return true;
         }
     }
     return false;
@@ -155,10 +141,10 @@ bool bfsCheck(int src, vector<vector<int>>& adj, vector<bool>& visited) {
 
 // DFS approach — parent passed through recursion
 bool dfsCheck(int node, int par, vector<vector<int>>& adj, vector<bool>& visited) {
-    visited[node] = true;
-    for (int nb : adj[node]) {
-        if (!visited[nb]) { if (dfsCheck(nb, node, adj, visited)) return true; }
-        else if (nb != par) return true;
+    visited[node]=true;
+    for(int nb : adj[node]){
+        if(!visited[nb]){ if(dfsCheck(nb,node,adj,visited)) return true; }
+        else if(nb!=par) return true;
     }
     return false;
 }

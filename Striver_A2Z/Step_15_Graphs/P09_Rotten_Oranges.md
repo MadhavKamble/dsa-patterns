@@ -92,95 +92,94 @@ Answer: 4
 ## Clean C++ Interview Code
 
 ```cpp
-/*
- * ROTTEN ORANGES (LC 994)
- *
- * PROBLEM UNDERSTANDING:
- *   Min minutes for all fresh oranges to rot via 4-directional simultaneous spread.
- *
- * KEY INSIGHT:
- *   Multi-source BFS — enqueue ALL initial rotten oranges at time 0.
- *   Each BFS level = 1 minute. Count fresh oranges; if any remain → -1.
- *
- * COMPLEXITY: Time O(m*n) | Space O(m*n)
- */
 class Solution {
 public:
     int orangesRotting(vector<vector<int>>& grid) {
-        int m = grid.size(), n = grid[0].size();
-        int dirs[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+        int n=grid.size();
+        int m=grid[0].size();
         queue<pair<int,int>> q;
-        int freshCount = 0;
+        int freshCount=0;
 
-        // enqueue all initially rotten oranges
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                if (grid[i][j] == 2) q.push({i, j});
-                else if (grid[i][j] == 1) freshCount++;
+        for(int i=0;i<n;i++)
+            for(int j=0;j<m;j++)
+                if(grid[i][j]==2) q.push({i,j});
+                else if(grid[i][j]==1) freshCount++;
 
-        if (freshCount == 0) return 0;
+        if(freshCount==0) return 0;
 
-        int minutes = 0;
+        int minutes=0;
+        int dRow[]={-1,0,1,0};
+        int dCol[]={0,1,0,-1};
 
-        while (!q.empty()) {
-            int sz = q.size();
-            bool rotted = false;
-
-            for (int k = 0; k < sz; k++) {
-                auto [r, c] = q.front(); q.pop();
-                for (auto& d : dirs) {
-                    int nr = r + d[0], nc = c + d[1];
-                    if (nr >= 0 && nr < m && nc >= 0 && nc < n &&
-                        grid[nr][nc] == 1) {
-                        grid[nr][nc] = 2;
+        while(!q.empty()){
+            int sz=q.size();
+            bool rotted=false;
+            for(int k=0;k<sz;k++){
+                auto it=q.front();
+                q.pop();
+                int row=it.first;
+                int col=it.second;
+                for(int i=0;i<4;i++){
+                    int newRow=row+dRow[i];
+                    int newCol=col+dCol[i];
+                    if(newRow>=0 && newRow<n &&
+                    newCol>=0 && newCol<m &&
+                    grid[newRow][newCol]==1){
+                        grid[newRow][newCol]=2;
                         freshCount--;
-                        q.push({nr, nc});
-                        rotted = true;
+                        q.push({newRow,newCol});
+                        rotted=true;
                     }
                 }
             }
-
-            if (rotted) minutes++;
+            if(rotted) minutes++;
         }
 
-        return freshCount == 0 ? minutes : -1;
+        return freshCount==0 ? minutes : -1;
     }
 };
 ```
 
-### Cleaner version (time stored in queue)
+### Variant (time stored in queue)
 
 ```cpp
-int orangesRotting(vector<vector<int>>& grid) {
-    int m = grid.size(), n = grid[0].size();
-    int dirs[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
-    queue<tuple<int,int,int>> q;   // {row, col, time}
-    int freshCount = 0;
+class Solution {
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+        int n=grid.size();
+        int m=grid[0].size();
+        queue<tuple<int,int,int>> q;
+        int freshCount=0;
 
-    for (int i = 0; i < m; i++)
-        for (int j = 0; j < n; j++) {
-            if (grid[i][j] == 2) q.push({i, j, 0});
-            else if (grid[i][j] == 1) freshCount++;
-        }
+        for(int i=0;i<n;i++)
+            for(int j=0;j<m;j++){
+                if(grid[i][j]==2) q.push({i,j,0});
+                else if(grid[i][j]==1) freshCount++;
+            }
 
-    int maxTime = 0;
+        int maxTime=0;
+        int dRow[]={-1,0,1,0};
+        int dCol[]={0,1,0,-1};
 
-    while (!q.empty()) {
-        auto [r, c, t] = q.front(); q.pop();
-        for (auto& d : dirs) {
-            int nr = r + d[0], nc = c + d[1];
-            if (nr >= 0 && nr < m && nc >= 0 && nc < n &&
-                grid[nr][nc] == 1) {
-                grid[nr][nc] = 2;
-                freshCount--;
-                maxTime = max(maxTime, t + 1);
-                q.push({nr, nc, t + 1});
+        while(!q.empty()){
+            auto [row,col,t]=q.front(); q.pop();
+            for(int i=0;i<4;i++){
+                int newRow=row+dRow[i];
+                int newCol=col+dCol[i];
+                if(newRow>=0 && newRow<n &&
+                newCol>=0 && newCol<m &&
+                grid[newRow][newCol]==1){
+                    grid[newRow][newCol]=2;
+                    freshCount--;
+                    maxTime=max(maxTime,t+1);
+                    q.push({newRow,newCol,t+1});
+                }
             }
         }
-    }
 
-    return freshCount == 0 ? maxTime : -1;
-}
+        return freshCount==0 ? maxTime : -1;
+    }
+};
 ```
 
 ---

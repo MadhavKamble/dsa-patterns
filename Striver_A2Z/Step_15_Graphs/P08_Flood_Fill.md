@@ -88,75 +88,69 @@ DFS(1,1): image[1][1]=2
 ## Clean C++ Interview Code
 
 ```cpp
-/*
- * FLOOD FILL (LC 733)
- *
- * PROBLEM UNDERSTANDING:
- *   Change starting pixel and all 4-connected same-color pixels to new color.
- *
- * KEY INSIGHT:
- *   DFS on grid. No separate visited array needed — color change = visited mark.
- *   Early exit if origColor == color prevents infinite recursion.
- *
- * COMPLEXITY: Time O(m*n) | Space O(m*n)
- */
 class Solution {
-    int dirs[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
+public:
+    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int color) {
+        int n=image.size();
+        int m=image[0].size();
+        int initialColor=image[sr][sc];
+        if(initialColor==color) return image;
 
-    void dfs(vector<vector<int>>& image, int r, int c,
-             int origColor, int newColor) {
-        image[r][c] = newColor;                    // mark visited by recoloring
-
-        for (auto& d : dirs) {
-            int nr = r + d[0], nc = c + d[1];
-            if (nr >= 0 && nr < image.size() &&
-                nc >= 0 && nc < image[0].size() &&
-                image[nr][nc] == origColor) {
-                dfs(image, nr, nc, origColor, newColor);
+        queue<pair<int,int>> q;
+        q.push({sr,sc});
+        image[sr][sc]=color;
+        int dRow[]={-1,0,1,0};
+        int dCol[]={0,1,0,-1};
+        while(!q.empty()){
+            auto it=q.front();
+            q.pop();
+            int row=it.first;
+            int col=it.second;
+            for(int i=0;i<4;i++){
+                int newRow=row+dRow[i];
+                int newCol=col+dCol[i];
+                if(newRow>=0 && newRow<n &&
+                newCol>=0 && newCol<m &&
+                image[newRow][newCol]==initialColor){
+                    image[newRow][newCol]=color;
+                    q.push({newRow,newCol});
+                }
             }
         }
-    }
-
-public:
-    vector<vector<int>> floodFill(vector<vector<int>>& image,
-                                  int sr, int sc, int color) {
-        int origColor = image[sr][sc];
-        if (origColor == color) return image;      // avoid infinite loop
-        dfs(image, sr, sc, origColor, color);
         return image;
     }
 };
 ```
 
-### BFS Variant
+### DFS Variant
 
 ```cpp
-vector<vector<int>> floodFill(vector<vector<int>>& image,
-                               int sr, int sc, int color) {
-    int origColor = image[sr][sc];
-    if (origColor == color) return image;
-
-    int m = image.size(), n = image[0].size();
-    int dirs[4][2] = {{-1,0},{1,0},{0,-1},{0,1}};
-    queue<pair<int,int>> q;
-
-    image[sr][sc] = color;
-    q.push({sr, sc});
-
-    while (!q.empty()) {
-        auto [r, c] = q.front(); q.pop();
-        for (auto& d : dirs) {
-            int nr = r + d[0], nc = c + d[1];
-            if (nr >= 0 && nr < m && nc >= 0 && nc < n &&
-                image[nr][nc] == origColor) {
-                image[nr][nc] = color;
-                q.push({nr, nc});
+class Solution {
+    void dfs(vector<vector<int>>& image, int row, int col,
+             int initialColor, int color, int n, int m) {
+        image[row][col]=color;
+        int dRow[]={-1,0,1,0};
+        int dCol[]={0,1,0,-1};
+        for(int i=0;i<4;i++){
+            int newRow=row+dRow[i];
+            int newCol=col+dCol[i];
+            if(newRow>=0 && newRow<n &&
+            newCol>=0 && newCol<m &&
+            image[newRow][newCol]==initialColor){
+                dfs(image,newRow,newCol,initialColor,color,n,m);
             }
         }
     }
-
-    return image;
-}
+public:
+    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int color) {
+        int n=image.size();
+        int m=image[0].size();
+        int initialColor=image[sr][sc];
+        if(initialColor==color) return image;
+        dfs(image,sr,sc,initialColor,color,n,m);
+        return image;
+    }
+};
 ```
 
 ---
