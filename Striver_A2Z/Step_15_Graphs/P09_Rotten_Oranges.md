@@ -97,87 +97,46 @@ public:
     int orangesRotting(vector<vector<int>>& grid) {
         int n=grid.size();
         int m=grid[0].size();
-        queue<pair<int,int>> q;
-        int freshCount=0;
-
-        for(int i=0;i<n;i++)
-            for(int j=0;j<m;j++)
-                if(grid[i][j]==2) q.push({i,j});
-                else if(grid[i][j]==1) freshCount++;
-
-        if(freshCount==0) return 0;
-
-        int minutes=0;
-        int dRow[]={-1,0,1,0};
-        int dCol[]={0,1,0,-1};
-
-        while(!q.empty()){
-            int sz=q.size();
-            bool rotted=false;
-            for(int k=0;k<sz;k++){
-                auto it=q.front();
-                q.pop();
-                int row=it.first;
-                int col=it.second;
-                for(int i=0;i<4;i++){
-                    int newRow=row+dRow[i];
-                    int newCol=col+dCol[i];
-                    if(newRow>=0 && newRow<n &&
-                    newCol>=0 && newCol<m &&
-                    grid[newRow][newCol]==1){
-                        grid[newRow][newCol]=2;
-                        freshCount--;
-                        q.push({newRow,newCol});
-                        rotted=true;
-                    }
+        queue<pair<pair<int,int>,int>> q;
+        vector<vector<int>> vis(n,vector<int>(m,0));
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(grid[i][j]==2){
+                    q.push({{i,j},0});
+                    vis[i][j]=2;
+                }else{
+                    vis[i][j]=0;
                 }
             }
-            if(rotted) minutes++;
         }
-
-        return freshCount==0 ? minutes : -1;
-    }
-};
-```
-
-### Variant (time stored in queue)
-
-```cpp
-class Solution {
-public:
-    int orangesRotting(vector<vector<int>>& grid) {
-        int n=grid.size();
-        int m=grid[0].size();
-        queue<tuple<int,int,int>> q;
-        int freshCount=0;
-
-        for(int i=0;i<n;i++)
-            for(int j=0;j<m;j++){
-                if(grid[i][j]==2) q.push({i,j,0});
-                else if(grid[i][j]==1) freshCount++;
-            }
-
-        int maxTime=0;
+        int time=0;
         int dRow[]={-1,0,1,0};
         int dCol[]={0,1,0,-1};
-
         while(!q.empty()){
-            auto [row,col,t]=q.front(); q.pop();
+            int r=q.front().first.first;
+            int c=q.front().first.second;
+            int t=q.front().second;
+            time=max(time,t);
+            q.pop();
             for(int i=0;i<4;i++){
-                int newRow=row+dRow[i];
-                int newCol=col+dCol[i];
+                int newRow=r+dRow[i];
+                int newCol=c+dCol[i];
                 if(newRow>=0 && newRow<n &&
                 newCol>=0 && newCol<m &&
-                grid[newRow][newCol]==1){
-                    grid[newRow][newCol]=2;
-                    freshCount--;
-                    maxTime=max(maxTime,t+1);
-                    q.push({newRow,newCol,t+1});
+                vis[newRow][newCol]!=2 && grid[newRow][newCol]==1){
+                    q.push({{newRow,newCol},t+1});
+                    vis[newRow][newCol]=2;
                 }
             }
         }
-
-        return freshCount==0 ? maxTime : -1;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                if(vis[i][j]!=2 && grid[i][j]==1){
+                    return -1;
+                }
+            }
+        }
+        return time;
     }
 };
 ```
@@ -186,9 +145,9 @@ public:
 
 ## Interview Explanation Script
 
-> "This is multi-source BFS. All rotten oranges spread simultaneously, so I enqueue all of them at minute 0 and process BFS level by level — each level is one minute."
+> "This is multi-source BFS. I enqueue all initially rotten oranges at time 0, each with their timestamp. I use a separate `vis` array so I don't destroy the original grid."
 
-> "I count fresh oranges upfront. Every time I rot a fresh one, I decrement the count. After BFS, if any fresh orange remains, it was unreachable — return -1. Otherwise return the number of BFS levels processed."
+> "Each cell in the queue carries `{{row,col}, time}`. As I dequeue, I track `time = max(time, t)` — the answer is the maximum time at which any orange rotted. After BFS I scan the vis array: if any fresh orange was never marked, it's unreachable — return -1."
 
 > "The key mistake to avoid: running separate BFS from each rotten orange. That simulates sequential spreading, not simultaneous. Multi-source BFS is the right model."
 
