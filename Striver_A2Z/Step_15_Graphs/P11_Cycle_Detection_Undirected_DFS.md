@@ -93,24 +93,31 @@ Return `false` ✅
 
 ```cpp
 class Solution {
-    bool dfsCheck(int node, int parent,
-                  vector<vector<int>>& adj, vector<bool>& visited) {
-        visited[node]=true;
-        for(int nb : adj[node]){
-            if(!visited[nb]){
-                if(dfsCheck(nb,node,adj,visited)) return true;
-            } else if(nb!=parent){
-                return true;
-            }
+  public:
+    bool dfs(int node, int parent,vector<int> adj[], int vis[]){
+        vis[node]=1;
+        for(auto adjacentNode:adj[node]){
+            if(!vis[adjacentNode]){
+                if(dfs(adjacentNode,node,adj,vis)==true){
+                    return true;
+                }
+            }else if(adjacentNode!=parent) return true;
         }
         return false;
     }
-public:
-    bool isCycle(int V, vector<vector<int>>& adj) {
-        vector<bool> visited(V,false);
+    bool isCycle(int V, vector<vector<int>>& edges) {
+        vector<int> adj[V];
+        for(auto edge:edges){
+            int u=edge[0];
+            int v=edge[1];
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+        int vis[V]={0};
         for(int i=0;i<V;i++){
-            if(!visited[i]){
-                if(dfsCheck(i,-1,adj,visited)) return true;
+            if(!vis[i]){
+                if(dfs(i,-1,adj,vis))
+                    return true;
             }
         }
         return false;
@@ -140,11 +147,11 @@ bool bfsCheck(int src, vector<vector<int>>& adj, vector<bool>& visited) {
 }
 
 // DFS approach — parent passed through recursion
-bool dfsCheck(int node, int par, vector<vector<int>>& adj, vector<bool>& visited) {
-    visited[node]=true;
-    for(int nb : adj[node]){
-        if(!visited[nb]){ if(dfsCheck(nb,node,adj,visited)) return true; }
-        else if(nb!=par) return true;
+bool dfs(int node, int parent, vector<int> adj[], int vis[]) {
+    vis[node]=1;
+    for(auto adjacentNode:adj[node]){
+        if(!vis[adjacentNode]){ if(dfs(adjacentNode,node,adj,vis)) return true; }
+        else if(adjacentNode!=parent) return true;
     }
     return false;
 }
