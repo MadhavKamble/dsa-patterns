@@ -113,7 +113,7 @@ class Solution {
         color[node]=col;
         for(auto adj : graph[node]) {
             if(color[adj]==-1) {
-                if(!dfs(adj, 1-col, color, graph)) return false;
+                if(!dfs(adj, !col, color, graph)) return false;
             }
             else if(color[adj]==col) {
                 return false;
@@ -139,7 +139,7 @@ public:
 
 ## Interview Explanation Script
 
-> "I use BFS with 2-coloring. Initialize all nodes as uncolored (-1). For each uncolored node, BFS and color it 0. For each neighbor: if uncolored, assign the opposite color (`1 - color[node]`) and enqueue; if already colored the same as the current node, we have a conflict — return false."
+> "I use BFS with 2-coloring. Initialize all nodes as uncolored (-1). For each uncolored node, BFS and color it 0. For each neighbor: if uncolored, assign the opposite color (`!color[node]`) and enqueue; if already colored the same as the current node, we have a conflict — return false."
 
 > "`!color[node]` is elegant: `!0=1` and `!1=0` — flips between the two colors with no branching."
 
