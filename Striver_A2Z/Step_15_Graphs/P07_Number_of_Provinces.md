@@ -144,38 +144,59 @@ public:
 ### Union-Find Variant
 
 ```cpp
-// Union-Find approach — O(n^2 * α(n)) ≈ O(n^2)
-class UnionFind {
-    vector<int> parent, rank;
+class DisjointSet {
+    vector<int> parent, size;
 public:
-    int components;
-    UnionFind(int n) : parent(n), rank(n, 0), components(n) {
-        iota(parent.begin(), parent.end(), 0);
+    DisjointSet(int n) {
+        parent.resize(n);
+        size.resize(n);
+        for(int i=0;i<n;i++){
+            parent[i]=i;
+            size[i]=1;
+        }
     }
-    int find(int x) {
-        if (parent[x] != x) parent[x] = find(parent[x]);
-        return parent[x];
+    int findUPar(int node) {
+        if(node==parent[node])
+            return node;
+        return parent[node]=findUPar(parent[node]);
     }
-    void unite(int x, int y) {
-        int px = find(x), py = find(y);
-        if (px == py) return;
-        if (rank[px] < rank[py]) swap(px, py);
-        parent[py] = px;
-        if (rank[px] == rank[py]) rank[px]++;
-        components--;
+    void unionBySize(int u, int v) {
+        int ulp_u=findUPar(u);
+        int ulp_v=findUPar(v);
+        if(ulp_u==ulp_v) return;
+        if(size[ulp_u]<size[ulp_v]){
+            parent[ulp_u]=ulp_v;
+            size[ulp_v]+=size[ulp_u];
+        }else{
+            parent[ulp_v]=ulp_u;
+            size[ulp_u]+=size[ulp_v];
+        }
     }
 };
 
-int findCircleNum(vector<vector<int>>& isConnected) {
-    int n = isConnected.size();
-    UnionFind uf(n);
-    for (int i = 0; i < n; i++)
-        for (int j = i + 1; j < n; j++)
-            if (isConnected[i][j] == 1)
-                uf.unite(i, j);
-    return uf.components;
-}
+class Solution {
+public:
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n=isConnected.size();
+        DisjointSet ds(n);
+        for(int i=0;i<n;i++){
+            for(int j=i+1;j<n;j++){
+                if(isConnected[i][j]==1){
+                    ds.unionBySize(i,j);
+                }
+            }
+        }
+        int provinces=0;
+        for(int i=0;i<n;i++){
+            if(ds.findUPar(i)==i) provinces++;
+        }
+        return provinces;
+    }
+};
 ```
+
+> Nodes are 0-indexed here — `resize(n)` not `resize(n+1)`.
+> Count provinces: after all unions, nodes whose `findUPar(i)==i` are roots — one root per province.
 
 ---
 
