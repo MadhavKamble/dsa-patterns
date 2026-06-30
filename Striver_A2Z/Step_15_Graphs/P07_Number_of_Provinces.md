@@ -145,8 +145,8 @@ public:
 
 ```cpp
 class DisjointSet {
-    vector<int> parent, size;
 public:
+    vector<int> parent, size;
     DisjointSet(int n) {
         parent.resize(n);
         size.resize(n);
@@ -188,7 +188,7 @@ public:
         }
         int provinces=0;
         for(int i=0;i<n;i++){
-            if(ds.findUPar(i)==i) provinces++;
+            if(ds.parent[i]==i) provinces++;
         }
         return provinces;
     }
@@ -196,7 +196,7 @@ public:
 ```
 
 > Nodes are 0-indexed here — `resize(n)` not `resize(n+1)`.
-> Count provinces: after all unions, nodes whose `findUPar(i)==i` are roots — one root per province.
+> `ds.parent[i]==i` — O(1) direct check. Safe after all unions: roots always satisfy `parent[root]==root` regardless of path compression state.
 
 ---
 
